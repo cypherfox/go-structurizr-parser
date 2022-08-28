@@ -15,7 +15,9 @@ const (
 	OPEN_BRACE    // {
 	CLOSING_BRACE // }
 	EQUAL         // =
-	RELATION      // ->
+	QUOTE         // "
+
+	RELATION // ->
 
 	// Model Keywords
 	WORKSPACE
@@ -124,6 +126,7 @@ var readables map[Token]string = map[Token]string{
 	OPEN_BRACE:    "{",
 	CLOSING_BRACE: "}",
 	EQUAL:         "=",
+	QUOTE:         "\"",
 
 	RELATION: "->",
 

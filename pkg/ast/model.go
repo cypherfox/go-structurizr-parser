@@ -51,7 +51,7 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			return fmt.Errorf("unexected token %s, expecting either model or view stanza or '}'", lit)
+			return fmtErrorf(p, "unexpected token %s, expecting either model or views stanza or '}'", lit)
 		}
 
 		if err != nil {
@@ -68,12 +68,20 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 	return nil
 }
 
+func fmtErrorf(p *Parser, fmtStr string, args ...interface{}) error {
+	posInfo := []interface{}{p.GetScanSource(), p.GetScanLine()}
+
+	allArgs := append(posInfo, args)
+	return fmt.Errorf("input %s:%d: "+fmtStr, allArgs...)
+}
+
 func nextParse(stmnt Statement, p *Parser) error {
 	return stmnt.Parse(p)
 }
 
 type ModelStatement struct {
-	elements []Element
+	// do not use a map, as the name of an object may change, and would not be updated here.
+	Elements []Element
 }
 
 func (m *ModelStatement) Parse(p *Parser) error {
@@ -91,11 +99,16 @@ func (m *ModelStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 
+		case SOFTWARE_SYSTEM:
+			e := &SoftwareSystemStatement{}
+			m.AddElement(e)
+			err = nextParse(e, p)
+
 		case CLOSING_BRACE:
 			closed = true
 
 		default:
-			return fmt.Errorf("unexected token %s, expecting '}'", lit)
+			return fmtErrorf(p, "unexected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
@@ -107,13 +120,14 @@ func (m *ModelStatement) Parse(p *Parser) error {
 	return nil
 }
 
-type ElementType int32
-
-const (
-	SoftwareSystem ElementType = iota
-)
-
-type Element struct {
-	ElementType ElementType
-	Name        string
+func (m *ModelStatement) AddElement(e Element) {
+	m.Elements = append(m.Elements, e)
+}
+func (m *ModelStatement) GetElementByName(name string) Element {
+	for _, e := range m.Elements {
+		if e.GetName() == name {
+			return e
+		}
+	}
+	return nil
 }

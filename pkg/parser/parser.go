@@ -16,8 +16,8 @@ type Parser struct {
 }
 
 // NewParser returns a new instance of Parser.
-func NewParser(r io.Reader) *Parser {
-	return &Parser{s: NewScanner(r)}
+func NewParser(r io.Reader, input string) *Parser {
+	return &Parser{s: NewScanner(r, input)}
 }
 
 // scan returns the next token from the underlying scanner.
@@ -57,7 +57,32 @@ func (p *Parser) Expect(expected Token) (string, error) {
 	lit := ""
 	var tok Token
 	if tok, lit = p.ScanIgnoreWhitespace(); tok != expected {
-		return "", fmt.Errorf("found %s, expected %s", tok.String(), expected.String())
+		return "", fmt.Errorf("found '%s', expected '%s'", tok.String(), expected.String())
 	}
 	return lit, nil
+}
+
+// ApplyFkt defines code to be executed if a desired token has been found.
+type ApplyFkt func(token Token, literal string) error
+
+// Maybe tries to read a certain token next, but unreads the token when it does not match.
+// If the token matches, function apply is executed
+func (p *Parser) Maybe(expected Token, apply ApplyFkt) error {
+	lit := ""
+	var tok Token
+	if tok, lit = p.ScanIgnoreWhitespace(); tok == expected {
+		apply(expected, lit)
+	} else {
+		p.unscan()
+	}
+
+	return nil
+}
+
+func (p *Parser) GetScanLine() uint32 {
+	return p.s.line
+}
+
+func (p *Parser) GetScanSource() string {
+	return p.s.source
 }

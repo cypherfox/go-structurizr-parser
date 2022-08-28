@@ -7,8 +7,16 @@ import (
 	"strings"
 )
 
+func isQuote(ch rune) bool {
+	return ch == '"'
+}
+
 func isWhitespace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n'
+}
+
+func isNewLine(ch rune) bool {
+	return ch == '\n'
 }
 
 func isLetter(ch rune) bool {
@@ -24,12 +32,17 @@ var eof = rune(0)
 
 // Scanner represents a lexical scanner.
 type Scanner struct {
-	r *bufio.Reader
+	r      *bufio.Reader
+	source string
+	line   uint32
 }
 
 // NewScanner returns a new instance of Scanner.
-func NewScanner(r io.Reader) *Scanner {
-	return &Scanner{r: bufio.NewReader(r)}
+func NewScanner(r io.Reader, s string) *Scanner {
+	return &Scanner{
+		r:      bufio.NewReader(r),
+		source: s,
+	}
 }
 
 // read reads the next rune from the bufferred reader.
@@ -38,6 +51,9 @@ func (s *Scanner) read() rune {
 	ch, _, err := s.r.ReadRune()
 	if err != nil {
 		return eof
+	}
+	if isNewLine(ch) {
+		s.line++
 	}
 	return ch
 }
@@ -56,6 +72,9 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 		s.unread()
 		return s.scanWhitespace()
 	} else if isLetter(ch) {
+		s.unread()
+		return s.scanIdent()
+	} else if isQuote(ch) {
 		s.unread()
 		return s.scanIdent()
 	}
@@ -103,13 +122,27 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 func (s *Scanner) scanIdent() (tok Token, lit string) {
 	// Create a buffer and read the current character into it.
 	var buf bytes.Buffer
-	buf.WriteRune(s.read())
+	ch := s.read()
+	quoted := false
+
+	if isQuote(ch) {
+		quoted = true
+	} else {
+		buf.WriteRune(ch)
+	}
 
 	// Read every subsequent ident character into the buffer.
 	// Non-ident characters and EOF will cause the loop to exit.
 	for {
-		if ch := s.read(); ch == eof {
+		ch = s.read()
+		if ch == eof {
 			break
+		} else if quoted {
+			if isQuote(ch) {
+				break
+			} else { // only another quote will stop it.
+				_, _ = buf.WriteRune(ch)
+			}
 		} else if !isLetter(ch) && !isDigit(ch) && ch != '_' {
 			s.unread()
 			break
