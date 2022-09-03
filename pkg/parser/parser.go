@@ -38,8 +38,8 @@ func (p *Parser) scan() (tok Token, lit string) {
 	return
 }
 
-// unscan pushes the previously read token back onto the buffer.
-func (p *Parser) unscan() { p.buf.n = 1 }
+// unScan pushes the previously read token back onto the buffer.
+func (p *Parser) unScan() { p.buf.n = 1 }
 
 // ScanIgnoreWhitespace scans the next non-whitespace token.
 func (p *Parser) ScanIgnoreWhitespace() (tok Token, lit string) {
@@ -57,7 +57,7 @@ func (p *Parser) Expect(expected Token) (string, error) {
 	lit := ""
 	var tok Token
 	if tok, lit = p.ScanIgnoreWhitespace(); tok != expected {
-		return "", fmt.Errorf("found '%s', expected '%s'", tok.String(), expected.String())
+		return "", FmtErrorf(p, "found '%s', expected '%s'", tok.String(), expected.String())
 	}
 	return lit, nil
 }
@@ -73,10 +73,33 @@ func (p *Parser) Maybe(expected Token, apply ApplyFkt) error {
 	if tok, lit = p.ScanIgnoreWhitespace(); tok == expected {
 		apply(expected, lit)
 	} else {
-		p.unscan()
+		p.unScan()
 	}
 
 	return nil
+}
+
+// ParseTags will attempt to scan a set of identifiers and quoted strings until either a newline or an opening brace is encountered
+func (p *Parser) ParseTags() ([]string, error) {
+	retArr := []string{}
+
+	for {
+		tok, lit := p.ScanIgnoreWhitespace()
+
+		switch tok {
+		case EOF:
+			return retArr, nil
+		case OPEN_BRACE:
+			p.unScan()
+			return retArr, nil
+		case IDENTIFIER:
+			retArr = append(retArr, lit)
+		case COMMA:
+			// ignore it
+		default:
+			return nil, fmt.Errorf("unexpected token %s lit:<%s>", tok.String(), lit)
+		}
+	}
 }
 
 func (p *Parser) GetScanLine() uint32 {
@@ -85,4 +108,11 @@ func (p *Parser) GetScanLine() uint32 {
 
 func (p *Parser) GetScanSource() string {
 	return p.s.source
+}
+
+func FmtErrorf(p *Parser, fmtStr string, args ...interface{}) error {
+	posInfo := []interface{}{p.GetScanSource(), p.GetScanLine()}
+
+	allArgs := append(posInfo, args...)
+	return fmt.Errorf("%s:%d: "+fmtStr, allArgs...)
 }

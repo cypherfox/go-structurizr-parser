@@ -1,8 +1,6 @@
 package ast
 
 import (
-	"fmt"
-
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
@@ -51,7 +49,7 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			return fmtErrorf(p, "unexpected token %s, expecting either model or views stanza or '}'", lit)
+			return FmtErrorf(p, "unexpected token %s, expecting either model or views stanza or '}'", lit)
 		}
 
 		if err != nil {
@@ -66,13 +64,6 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 	}
 
 	return nil
-}
-
-func fmtErrorf(p *Parser, fmtStr string, args ...interface{}) error {
-	posInfo := []interface{}{p.GetScanSource(), p.GetScanLine()}
-
-	allArgs := append(posInfo, args)
-	return fmt.Errorf("input %s:%d: "+fmtStr, allArgs...)
 }
 
 func nextParse(stmnt Statement, p *Parser) error {
@@ -103,12 +94,15 @@ func (m *ModelStatement) Parse(p *Parser) error {
 			e := &SoftwareSystemStatement{}
 			m.AddElement(e)
 			err = nextParse(e, p)
+			if err != nil {
+				return err
+			}
 
 		case CLOSING_BRACE:
 			closed = true
 
 		default:
-			return fmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			return FmtErrorf(p, "found %s ('%s'), expected '}'", tok.String(), lit)
 		}
 
 		if err != nil {

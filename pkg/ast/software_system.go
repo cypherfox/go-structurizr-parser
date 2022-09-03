@@ -29,6 +29,9 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 		return err
 	}
 
+	pTags, err := p.ParseTags()
+	s.Tags = append(s.Tags, pTags...)
+
 	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
 		return err
@@ -44,7 +47,7 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			return fmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			return FmtErrorf(p, "unexected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {

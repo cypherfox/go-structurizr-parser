@@ -27,7 +27,7 @@ func (v *ViewsStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			return fmt.Errorf("unexected token %s, expecting '}'", lit)
+			return fmt.Errorf("found %s ('%s'), expected '}'", tok.String(), lit)
 		}
 
 		if err != nil {

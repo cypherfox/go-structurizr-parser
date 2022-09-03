@@ -1,6 +1,7 @@
 package ast_test
 
 import (
+	"encoding/json"
 	"reflect"
 	"strings"
 	"testing"
@@ -54,7 +55,19 @@ func TestParse(t *testing.T) {
 		},
 
 		{
-			label: "single software system",
+			label: "single software system, no description",
+			s: `workspace {
+						model {
+							softwaresystem app {
+
+							}
+						}
+					}`,
+			stmt_fnc: singleSoftwareSystemStmtNoDescGen,
+		},
+
+		{
+			label: "single software system with description",
 			s: `workspace {
 						model {
 							softwaresystem app "This is a multi word description" {
@@ -81,17 +94,16 @@ func TestParse(t *testing.T) {
 		{
 			label: "empty file",
 			s:     ``,
-			err:   `found '<end of file>', expected 'workspace'`,
+			err:   `<string input>:0: found '<end of file>', expected 'workspace'`,
 		},
 		{
 			label: "missing closing brace for model definition",
 			s: `workspace {
 					model {
-				softwaresystem {
-
-				}
-			}
-		}`, err: `found '{', expected '<an identifier>'`},
+						softwaresystem foo {
+						}
+				`,
+			err: `<string input>:8: found <end of file> (''), expected '}'`},
 	}
 
 	for i, tt := range tests {
@@ -103,12 +115,17 @@ func TestParse(t *testing.T) {
 			t.Errorf("%d. (%s) %q: error mismatch:\n  exp=%s\n  got=%s\n\n", i, tt.label, tt.s, tt.err, err)
 
 		} else if tt.err == "" && tt.stmt != nil && !reflect.DeepEqual(tt.stmt, stmt) {
-			t.Errorf("%d. (%s) %q\n\nstmt mismatch:\n\nexp=%#v\n\ngot=%#v\n\n", i, tt.label, tt.s, tt.stmt, stmt)
+			t.Errorf("%d. (%s) %q\n\nstmt mismatch:\n\nexp=%s\n\ngot=%s\n\n", i, tt.label, tt.s, prettyPrint(tt.stmt), prettyPrint(stmt))
 
 		} else if tt.stmt_fnc != nil && !reflect.DeepEqual(tt.stmt_fnc(), stmt) {
-			t.Errorf("%d. (%s) %q\n\nstmt mismatch:\n\nexp=%#v\n\ngot=%#v\n\n", i, tt.label, tt.s, tt.stmt_fnc(), stmt)
+			t.Errorf("%d. (%s) %q\n\nstmt mismatch:\n\nexp=%s\n\ngot=%s\n\n", i, tt.label, tt.s, prettyPrint(tt.stmt_fnc()), prettyPrint(stmt))
 		}
 	}
+}
+
+func prettyPrint(v interface{}) string {
+	ret, _ := json.MarshalIndent(v, "", " ")
+	return string(ret)
 }
 
 // errstring returns the string representation of an error.
@@ -133,6 +150,14 @@ func singleSoftwareSystemStmtGen() *ast.WorkspaceStatement {
 	ret := &ast.WorkspaceStatement{
 		Model: model,
 	}
+
+	return ret
+}
+
+func singleSoftwareSystemStmtNoDescGen() *ast.WorkspaceStatement {
+	ret := singleSoftwareSystemStmtGen()
+	swss := ret.Model.GetElementByName("app").(*ast.SoftwareSystemStatement)
+	swss.Description = ""
 
 	return ret
 }
