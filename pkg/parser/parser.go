@@ -39,7 +39,7 @@ func (p *Parser) scan() (tok Token, lit string) {
 }
 
 // unScan pushes the previously read token back onto the buffer.
-func (p *Parser) unScan() { p.buf.n = 1 }
+func (p *Parser) UnScan() { p.buf.n = 1 }
 
 // ScanIgnoreWhitespace scans the next non-whitespace token.
 func (p *Parser) ScanIgnoreWhitespace() (tok Token, lit string) {
@@ -62,6 +62,20 @@ func (p *Parser) Expect(expected Token) (string, error) {
 	return lit, nil
 }
 
+// Expect expects a certain identifier fail with usefull error message if it is
+// not found. It will return the literal if successful
+func (p *Parser) ExpectIdentifier(expected string) error {
+	lit, err := p.Expect(IDENTIFIER)
+	if err != nil {
+		return err
+	}
+
+	if lit != expected {
+		return FmtErrorf(p, "found identifier '%s', expected '%s'", lit, expected)
+	}
+	return nil
+}
+
 // ApplyFkt defines code to be executed if a desired token has been found.
 type ApplyFkt func(token Token, literal string) error
 
@@ -73,7 +87,7 @@ func (p *Parser) Maybe(expected Token, apply ApplyFkt) error {
 	if tok, lit = p.ScanIgnoreWhitespace(); tok == expected {
 		apply(expected, lit)
 	} else {
-		p.unScan()
+		p.UnScan()
 	}
 
 	return nil
@@ -90,7 +104,7 @@ func (p *Parser) ParseTags() ([]string, error) {
 		case EOF:
 			return retArr, nil
 		case OPEN_BRACE:
-			p.unScan()
+			p.UnScan()
 			return retArr, nil
 		case IDENTIFIER:
 			retArr = append(retArr, lit)

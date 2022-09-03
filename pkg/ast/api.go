@@ -1,10 +1,22 @@
 package ast
 
-type ElementType int32
+import (
+	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
+)
+
+type ElementType Token
 
 const (
-	SoftwareSystem ElementType = iota
+	SoftwareSystem ElementType = ElementType(SOFTWARE_SYSTEM)
+	Enterprise     ElementType = ElementType(ENTERPRISE)
+	Group          ElementType = ElementType(GROUP)
+	Person         ElementType = ElementType(PERSON)
 )
+
+func (e ElementType) String() string {
+	t := Token(e)
+	return t.String()
+}
 
 type ElementContainer interface {
 	GetElementByName(name string) Element
@@ -13,5 +25,5 @@ type ElementContainer interface {
 type Element interface {
 	GetElementType() ElementType
 	GetName() string
-	AddTags(tags ...string)
+	AddTags(tags ...string) error
 }

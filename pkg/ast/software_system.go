@@ -13,9 +13,12 @@ type SoftwareSystemStatement struct {
 }
 
 func (s *SoftwareSystemStatement) Parse(p *Parser) error {
-	// SoftwareSystem was already eaten by the workspace
+	lit, err := p.Expect(SOFTWARE_SYSTEM)
+	if err != nil {
+		return err
+	}
 
-	lit, err := p.Expect(IDENTIFIER)
+	lit, err = p.Expect(IDENTIFIER)
 	if err != nil {
 		return err
 	}
@@ -65,4 +68,7 @@ func (s *SoftwareSystemStatement) GetElementType() ElementType {
 
 func (s *SoftwareSystemStatement) GetName() string { return s.Name }
 
-func (s *SoftwareSystemStatement) AddTags(tags ...string) { s.Tags = append(s.Tags, tags...) }
+func (s *SoftwareSystemStatement) AddTags(tags ...string) error {
+	s.Tags = append(s.Tags, tags...)
+	return nil
+}

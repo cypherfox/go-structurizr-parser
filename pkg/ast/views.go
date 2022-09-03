@@ -12,7 +12,12 @@ type ViewsStatement struct {
 
 func (v *ViewsStatement) Parse(p *Parser) error {
 
-	_, err := p.Expect(OPEN_BRACE)
+	_, err := p.Expect(VIEWS)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
 		return err
 	}

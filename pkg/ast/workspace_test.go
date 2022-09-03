@@ -12,16 +12,18 @@ import (
 
 type stmtFactory func() *ast.WorkspaceStatement
 
-// Ensure the scanner can scan tokens correctly.
-func TestParse(t *testing.T) {
+type testCase struct {
+	label    string
+	s        string
+	stmt     *ast.WorkspaceStatement // literal datastructure to check
+	stmt_fnc stmtFactory             // function to generate data structure to check
+	err      string
+}
 
-	var tests = []struct {
-		label    string
-		s        string
-		stmt     *ast.WorkspaceStatement // literal datastructure to check
-		stmt_fnc stmtFactory             // function to generate data structure to check
-		err      string
-	}{
+// Ensure the scanner can scan tokens correctly.
+func TestWorkspaceParse(t *testing.T) {
+
+	var tests = []testCase{
 		{
 			label: "Single field statement",
 			s: `workspace {
@@ -106,6 +108,10 @@ func TestParse(t *testing.T) {
 			err: `<string input>:8: found <end of file> (''), expected '}'`},
 	}
 
+	runTests(t, tests)
+}
+
+func runTests(t *testing.T, tests []testCase) {
 	for i, tt := range tests {
 		parser := parser.NewParser(strings.NewReader(tt.s), "<string input>")
 
@@ -121,6 +127,7 @@ func TestParse(t *testing.T) {
 			t.Errorf("%d. (%s) %q\n\nstmt mismatch:\n\nexp=%s\n\ngot=%s\n\n", i, tt.label, tt.s, prettyPrint(tt.stmt_fnc()), prettyPrint(stmt))
 		}
 	}
+
 }
 
 func prettyPrint(v interface{}) string {

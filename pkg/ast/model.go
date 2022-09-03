@@ -38,10 +38,12 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 		case MODEL:
+			p.UnScan()
 			w.Model = &ModelStatement{}
 			err = nextParse(w.Model, p)
 
 		case VIEWS:
+			p.UnScan()
 			w.Views = &ViewsStatement{}
 			err = nextParse(w.Views, p)
 
@@ -72,14 +74,18 @@ func nextParse(stmnt Statement, p *Parser) error {
 
 type ModelStatement struct {
 	// do not use a map, as the name of an object may change, and would not be updated here.
-	Elements []Element
+	Elements   []Element
+	Enterprise *EnterpriseStatement // there at most be one enterprise be defined per modell
 }
 
 func (m *ModelStatement) Parse(p *Parser) error {
 
-	// Model was already eaten by the workspace
+	_, err := p.Expect(MODEL)
+	if err != nil {
+		return err
+	}
 
-	_, err := p.Expect(OPEN_BRACE)
+	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
 		return err
 	}
@@ -90,10 +96,25 @@ func (m *ModelStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 
-		case SOFTWARE_SYSTEM:
-			e := &SoftwareSystemStatement{}
-			m.AddElement(e)
+		case ENTERPRISE:
+			p.UnScan()
+			e := &EnterpriseStatement{}
+			if m.Enterprise == nil {
+				m.Enterprise = e
+			} else {
+				return FmtErrorf(p, "only one enterprise per model allowed")
+			}
+
 			err = nextParse(e, p)
+			if err != nil {
+				return err
+			}
+
+		case SOFTWARE_SYSTEM:
+			p.UnScan()
+			s := &SoftwareSystemStatement{}
+			m.AddElement(s)
+			err = nextParse(s, p)
 			if err != nil {
 				return err
 			}
@@ -117,6 +138,7 @@ func (m *ModelStatement) Parse(p *Parser) error {
 func (m *ModelStatement) AddElement(e Element) {
 	m.Elements = append(m.Elements, e)
 }
+
 func (m *ModelStatement) GetElementByName(name string) Element {
 	for _, e := range m.Elements {
 		if e.GetName() == name {
