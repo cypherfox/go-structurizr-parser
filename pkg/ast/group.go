@@ -50,9 +50,12 @@ func (g *GroupStatement) Parse(p *Parser) error {
 
 		case CLOSING_BRACE:
 			closed = true
+			continue
 
+		case GROUP:
+			err = FmtErrorf(p, "Groups may not be nested")
 		default:
-			return FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {

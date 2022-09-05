@@ -16,7 +16,7 @@ func TestGroupParse(t *testing.T) {
 						group "Grp1" {}
 					}
 				}`,
-			stmt_fnc: minimalEnterpriseGen,
+			stmt_fnc: minimalGroupGen,
 		},
 
 		{
@@ -24,7 +24,7 @@ func TestGroupParse(t *testing.T) {
 			s: `workspace {
 					model {
 						enterprise "Corp" {
-							group "Grp1 {}
+							group "Grp1" {}
 						}
 					}
 				}`,
@@ -33,25 +33,15 @@ func TestGroupParse(t *testing.T) {
 
 		// ERRORS
 		{
-			label: "minimal enterprise",
+			label: "no nested groups",
 			s: `workspace {
 					model {
-						enterprise "Corp1" {}
-						enterprise "Corp2" {}
+						group "Grp1" {
+							group "Grp2" {}
+						}
 					}
 				}`,
-			err: "<string input>:6: only one enterprise per model allowed",
-		},
-
-		{
-			label: "minimal enterprise",
-			s: `workspace {
-					model {
-						enterprise "Corp1" {}
-						enterprise "Corp1" {}
-					}
-				}`,
-			err: "<string input>:6: only one enterprise per model allowed",
+			err: "<string input>:6: Groups may not be nested",
 		},
 	}
 
@@ -60,7 +50,8 @@ func TestGroupParse(t *testing.T) {
 
 func minimalGroupGen() *ast.WorkspaceStatement {
 	group := &ast.GroupStatement{
-		Name: "Grp1",
+		Parent: ast.Model,
+		Name:   "Grp1",
 	}
 
 	model := &ast.ModelStatement{}
@@ -77,8 +68,11 @@ func enterpriseWithGroupGen() *ast.WorkspaceStatement {
 	ret := minimalEnterpriseGen()
 
 	group := &ast.GroupStatement{
-		Name: "Grp1",
+		Parent: ast.Enterprise,
+		Name:   "Grp1",
 	}
 
 	ret.Model.Enterprise.AddElement(group)
+
+	return ret
 }

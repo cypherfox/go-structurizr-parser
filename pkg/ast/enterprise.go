@@ -62,11 +62,21 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 
+		case GROUP:
+			p.UnScan()
+			g := &GroupStatement{}
+			g.Parent = Enterprise
+			e.AddElement(g)
+			err = nextParse(g, p)
+
+		// TODO: PERSON SOFTWARE_SYSTEM RELATIONSHIP
+
 		case CLOSING_BRACE:
 			closed = true
+			continue
 
 		default:
-			return FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {

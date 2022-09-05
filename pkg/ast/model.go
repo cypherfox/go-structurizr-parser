@@ -106,24 +106,26 @@ func (m *ModelStatement) Parse(p *Parser) error {
 			}
 
 			err = nextParse(e, p)
-			if err != nil {
-				return err
-			}
+
+		case GROUP:
+			p.UnScan()
+			g := &GroupStatement{}
+			g.Parent = Model
+			m.AddElement(g)
+			err = nextParse(g, p)
 
 		case SOFTWARE_SYSTEM:
 			p.UnScan()
 			s := &SoftwareSystemStatement{}
 			m.AddElement(s)
 			err = nextParse(s, p)
-			if err != nil {
-				return err
-			}
 
 		case CLOSING_BRACE:
 			closed = true
+			continue
 
 		default:
-			return FmtErrorf(p, "found %s ('%s'), expected '}'", tok.String(), lit)
+			err = FmtErrorf(p, "found %s ('%s'), expected '}'", tok.String(), lit)
 		}
 
 		if err != nil {
