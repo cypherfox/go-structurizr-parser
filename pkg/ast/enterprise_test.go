@@ -47,17 +47,14 @@ func TestEnterpriseParse(t *testing.T) {
 }
 
 func minimalEnterpriseGen() *ast.WorkspaceStatement {
-	enterprise := &ast.EnterpriseStatement{
-		Name: "Corp",
-	}
+	enterprise := ast.NewEnterpriseStatement()
+	enterprise.Name = "Corp"
 
-	model := &ast.ModelStatement{
-		Enterprise: enterprise,
-	}
+	model := ast.NewModelStatement()
+	model.Enterprise = enterprise
 
-	ret := &ast.WorkspaceStatement{
-		Model: model,
-	}
+	ret := ast.NewWorkspaceStatement()
+	ret.Model = model
 
 	return ret
 }

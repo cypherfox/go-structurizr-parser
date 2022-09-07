@@ -4,7 +4,7 @@ import (
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
-type SoftwareSystemStatement struct {
+type PersonStatement struct {
 	Name        string
 	Description string
 	Tags        []string
@@ -12,16 +12,16 @@ type SoftwareSystemStatement struct {
 	Elements    []*Element
 }
 
-func NewSoftwareSystemStatement() *SoftwareSystemStatement {
-	ret := &SoftwareSystemStatement{}
+func NewPersonStatement() *PersonStatement {
+	ret := &PersonStatement{}
 
-	ret.AddTags("Element", "Software System")
+	ret.AddTags("Element", "Person")
 
 	return ret
 }
 
-func (s *SoftwareSystemStatement) Parse(p *Parser) error {
-	lit, err := p.Expect(SOFTWARE_SYSTEM)
+func (ps *PersonStatement) Parse(p *Parser) error {
+	lit, err := p.Expect(PERSON)
 	if err != nil {
 		return err
 	}
@@ -30,10 +30,10 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 	if err != nil {
 		return err
 	}
-	s.Name = lit
+	ps.Name = lit
 
 	err = p.Maybe(IDENTIFIER, func(tok Token, lit string) error {
-		s.Description = lit
+		ps.Description = lit
 		return nil
 	})
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 	}
 
 	pTags, err := p.ParseTags()
-	s.AddTags(pTags...)
+	ps.AddTags(pTags...)
 
 	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			return FmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
@@ -70,13 +70,15 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 	return nil
 }
 
-func (s *SoftwareSystemStatement) GetElementType() ElementType {
-	return SoftwareSystem
+func (p *PersonStatement) GetElementType() ElementType {
+	return Person
 }
 
-func (s *SoftwareSystemStatement) GetName() string { return s.Name }
+func (p *PersonStatement) GetName() string {
+	return p.Name
+}
 
-func (s *SoftwareSystemStatement) AddTags(tags ...string) error {
-	s.Tags = append(s.Tags, tags...)
+func (p *PersonStatement) AddTags(tags ...string) error {
+	p.Tags = append(p.Tags, tags...)
 	return nil
 }

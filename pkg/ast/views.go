@@ -10,6 +10,12 @@ type ViewsStatement struct {
 	name string
 }
 
+func NewViewsStatement() *ViewsStatement {
+	ret := &ViewsStatement{}
+
+	return ret
+}
+
 func (v *ViewsStatement) Parse(p *Parser) error {
 
 	_, err := p.Expect(VIEWS)

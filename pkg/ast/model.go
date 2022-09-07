@@ -9,8 +9,14 @@ type WorkspaceStatement struct {
 	Views *ViewsStatement
 }
 
+func NewWorkspaceStatement() *WorkspaceStatement {
+	ret := &WorkspaceStatement{}
+
+	return ret
+}
+
 func Parse(p *Parser) (*WorkspaceStatement, error) {
-	stmt := &WorkspaceStatement{}
+	stmt := NewWorkspaceStatement()
 
 	err := stmt.Parse(p)
 	if err != nil {
@@ -39,12 +45,12 @@ func (w *WorkspaceStatement) Parse(p *Parser) error {
 		switch tok {
 		case MODEL:
 			p.UnScan()
-			w.Model = &ModelStatement{}
+			w.Model = NewModelStatement()
 			err = nextParse(w.Model, p)
 
 		case VIEWS:
 			p.UnScan()
-			w.Views = &ViewsStatement{}
+			w.Views = NewViewsStatement()
 			err = nextParse(w.Views, p)
 
 		case CLOSING_BRACE:
@@ -78,6 +84,12 @@ type ModelStatement struct {
 	Enterprise *EnterpriseStatement // there at most be one enterprise be defined per modell
 }
 
+func NewModelStatement() *ModelStatement {
+	ret := &ModelStatement{}
+
+	return ret
+}
+
 func (m *ModelStatement) Parse(p *Parser) error {
 
 	_, err := p.Expect(MODEL)
@@ -98,7 +110,7 @@ func (m *ModelStatement) Parse(p *Parser) error {
 
 		case ENTERPRISE:
 			p.UnScan()
-			e := &EnterpriseStatement{}
+			e := NewEnterpriseStatement()
 			if m.Enterprise == nil {
 				m.Enterprise = e
 			} else {
@@ -107,16 +119,22 @@ func (m *ModelStatement) Parse(p *Parser) error {
 
 			err = nextParse(e, p)
 
+		case PERSON:
+			p.UnScan()
+			ps := NewPersonStatement()
+			m.AddElement(ps)
+			err = nextParse(ps, p)
+
 		case GROUP:
 			p.UnScan()
-			g := &GroupStatement{}
+			g := NewGroupStatement()
 			g.Parent = Model
 			m.AddElement(g)
 			err = nextParse(g, p)
 
 		case SOFTWARE_SYSTEM:
 			p.UnScan()
-			s := &SoftwareSystemStatement{}
+			s := NewSoftwareSystemStatement()
 			m.AddElement(s)
 			err = nextParse(s, p)
 

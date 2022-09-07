@@ -28,7 +28,7 @@ func TestWorkspaceParse(t *testing.T) {
 			label: "Single field statement",
 			s: `workspace {
 				}`,
-			stmt: &ast.WorkspaceStatement{},
+			stmt: ast.NewWorkspaceStatement(),
 		},
 
 		{
@@ -38,7 +38,7 @@ func TestWorkspaceParse(t *testing.T) {
 				}
 			}`,
 			stmt: &ast.WorkspaceStatement{
-				Model: &ast.ModelStatement{},
+				Model: ast.NewModelStatement(),
 			},
 		},
 
@@ -144,19 +144,16 @@ func errstring(err error) string {
 }
 
 func singleSoftwareSystemStmtGen() *ast.WorkspaceStatement {
-	model := &ast.ModelStatement{
-		Elements: []ast.Element{},
-	}
+	model := ast.NewModelStatement()
 
-	add := &ast.SoftwareSystemStatement{
-		Name:        "app",
-		Description: "This is a multi word description",
-	}
+	add := ast.NewSoftwareSystemStatement()
+
+	add.Name = "app"
+	add.Description = "This is a multi word description"
 	model.AddElement(add)
 
-	ret := &ast.WorkspaceStatement{
-		Model: model,
-	}
+	ret := ast.NewWorkspaceStatement()
+	ret.Model = model
 
 	return ret
 }

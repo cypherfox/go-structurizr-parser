@@ -11,6 +11,12 @@ type EnterpriseStatement struct {
 	Elements []Element
 }
 
+func NewEnterpriseStatement() *EnterpriseStatement {
+	ret := &EnterpriseStatement{}
+
+	return ret
+}
+
 func (e *EnterpriseStatement) GetElementType() ElementType {
 	return Enterprise
 }
@@ -64,12 +70,17 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 
 		case GROUP:
 			p.UnScan()
-			g := &GroupStatement{}
+			g := NewGroupStatement()
 			g.Parent = Enterprise
 			e.AddElement(g)
 			err = nextParse(g, p)
 
-		// TODO: PERSON SOFTWARE_SYSTEM RELATIONSHIP
+			// TODO: PERSON SOFTWARE_SYSTEM RELATIONSHIP
+		case PERSON:
+			p.UnScan()
+			ps := NewPersonStatement()
+			e.AddElement(ps)
+			err = nextParse(ps, p)
 
 		case CLOSING_BRACE:
 			closed = true

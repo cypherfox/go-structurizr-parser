@@ -12,6 +12,12 @@ type GroupStatement struct {
 	Elements []Element
 }
 
+func NewGroupStatement() *GroupStatement {
+	ret := &GroupStatement{}
+
+	return ret
+}
+
 func (g *GroupStatement) GetElementType() ElementType {
 	return Group
 }
