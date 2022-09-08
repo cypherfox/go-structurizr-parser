@@ -127,8 +127,7 @@ func (m *ModelStatement) Parse(p *Parser) error {
 
 		case GROUP:
 			p.UnScan()
-			g := NewGroupStatement()
-			g.Parent = Model
+			g := NewGroupStatement(Model)
 			m.AddElement(g)
 			err = nextParse(g, p)
 
@@ -137,6 +136,12 @@ func (m *ModelStatement) Parse(p *Parser) error {
 			s := NewSoftwareSystemStatement()
 			m.AddElement(s)
 			err = nextParse(s, p)
+
+		case CONTAINER:
+			p.UnScan()
+			c := NewContainerStatement()
+			m.AddElement(c)
+			err = nextParse(c, p)
 
 		case CLOSING_BRACE:
 			closed = true

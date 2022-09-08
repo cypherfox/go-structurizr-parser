@@ -70,17 +70,28 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 
 		case GROUP:
 			p.UnScan()
-			g := NewGroupStatement()
-			g.Parent = Enterprise
+			g := NewGroupStatement(Enterprise)
 			e.AddElement(g)
 			err = nextParse(g, p)
 
-			// TODO: PERSON SOFTWARE_SYSTEM RELATIONSHIP
+			// TODO: RELATIONSHIP
 		case PERSON:
 			p.UnScan()
 			ps := NewPersonStatement()
 			e.AddElement(ps)
 			err = nextParse(ps, p)
+
+		case SOFTWARE_SYSTEM:
+			p.UnScan()
+			s := NewSoftwareSystemStatement()
+			e.AddElement(s)
+			err = nextParse(s, p)
+
+		case CONTAINER:
+			p.UnScan()
+			c := NewContainerStatement()
+			e.AddElement(c)
+			err = nextParse(c, p)
 
 		case CLOSING_BRACE:
 			closed = true

@@ -9,7 +9,7 @@ type PersonStatement struct {
 	Description string
 	Tags        []string
 	Properties  map[string]string
-	Elements    []*Element
+	Elements    []Element
 }
 
 func NewPersonStatement() *PersonStatement {

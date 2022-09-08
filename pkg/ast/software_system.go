@@ -9,7 +9,7 @@ type SoftwareSystemStatement struct {
 	Description string
 	Tags        []string
 	Properties  map[string]string
-	Elements    []*Element
+	Elements    []Element
 }
 
 func NewSoftwareSystemStatement() *SoftwareSystemStatement {
@@ -54,11 +54,17 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 
+		case GROUP:
+			p.UnScan()
+			g := NewGroupStatement(SoftwareSystem)
+			s.AddElement(g)
+			err = nextParse(g, p)
+
 		case CLOSING_BRACE:
 			closed = true
 
 		default:
-			return FmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
@@ -78,5 +84,18 @@ func (s *SoftwareSystemStatement) GetName() string { return s.Name }
 
 func (s *SoftwareSystemStatement) AddTags(tags ...string) error {
 	s.Tags = append(s.Tags, tags...)
+	return nil
+}
+
+func (s *SoftwareSystemStatement) AddElement(e Element) {
+	s.Elements = append(s.Elements, e)
+}
+
+func (s *SoftwareSystemStatement) GetElementByName(name string) Element {
+	for _, e := range s.Elements {
+		if s.GetName() == name {
+			return e
+		}
+	}
 	return nil
 }

@@ -12,6 +12,7 @@ const (
 	Enterprise     ElementType = ElementType(ENTERPRISE)
 	Group          ElementType = ElementType(GROUP)
 	Person         ElementType = ElementType(PERSON)
+	Container      ElementType = ElementType(CONTAINER)
 )
 
 func (e ElementType) String() string {
@@ -21,6 +22,7 @@ func (e ElementType) String() string {
 
 type ElementContainer interface {
 	GetElementByName(name string) Element
+	AddElement(Element)
 }
 
 type Element interface {

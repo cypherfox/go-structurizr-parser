@@ -12,8 +12,10 @@ type GroupStatement struct {
 	Elements []Element
 }
 
-func NewGroupStatement() *GroupStatement {
-	ret := &GroupStatement{}
+func NewGroupStatement(parent ElementType) *GroupStatement {
+	ret := &GroupStatement{
+		Parent: parent,
+	}
 
 	return ret
 }

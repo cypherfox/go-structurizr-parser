@@ -49,9 +49,7 @@ func TestGroupParse(t *testing.T) {
 }
 
 func minimalGroupGen() *ast.WorkspaceStatement {
-	group := ast.NewGroupStatement()
-
-	group.Parent = ast.Model
+	group := ast.NewGroupStatement(ast.Model)
 	group.Name = "Grp1"
 
 	model := ast.NewModelStatement()
@@ -66,8 +64,7 @@ func minimalGroupGen() *ast.WorkspaceStatement {
 func enterpriseWithGroupGen() *ast.WorkspaceStatement {
 	ret := minimalEnterpriseGen()
 
-	group := ast.NewGroupStatement()
-	group.Parent = ast.Enterprise
+	group := ast.NewGroupStatement(ast.Enterprise)
 	group.Name = "Grp1"
 
 	ret.Model.Enterprise.AddElement(group)
