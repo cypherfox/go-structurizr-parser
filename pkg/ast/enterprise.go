@@ -29,23 +29,6 @@ func (e *EnterpriseStatement) AddTags(tags ...string) error {
 	return fmt.Errorf("cannot set tags on Enterprise statement, as there are neither tags in the header nor are they allowed as children of the element.")
 }
 
-func (es *EnterpriseStatement) AddElement(e Element) error {
-	etype := e.GetElementType()
-	switch etype {
-	case Group:
-		break
-	case Person:
-		break
-	case SoftwareSystem:
-		break
-	default:
-		return fmt.Errorf("element type %s not allowed in enterprise statement", etype.String())
-	}
-
-	es.Elements = append(es.Elements, e)
-	return nil
-}
-
 func (e *EnterpriseStatement) Parse(p *Parser) error {
 	lit, err := p.Expect(ENTERPRISE)
 	if err != nil {
@@ -109,4 +92,25 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 
 	return nil
 
+}
+
+func (es *EnterpriseStatement) AddElement(e Element) error {
+	etype := e.GetElementType()
+	switch etype {
+	case Group:
+		break
+	case Person:
+		break
+	case SoftwareSystem:
+		break
+	default:
+		return fmt.Errorf("element type %s not allowed in enterprise statement", etype.String())
+	}
+
+	es.Elements = append(es.Elements, e)
+	return nil
+}
+
+func (es *EnterpriseStatement) GetElementByName(name string) Element {
+	return GetElementByName(name, es.Elements)
 }

@@ -4,80 +4,6 @@ import (
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
-type WorkspaceStatement struct {
-	Model *ModelStatement
-	Views *ViewsStatement
-}
-
-func NewWorkspaceStatement() *WorkspaceStatement {
-	ret := &WorkspaceStatement{}
-
-	return ret
-}
-
-func Parse(p *Parser) (*WorkspaceStatement, error) {
-	stmt := NewWorkspaceStatement()
-
-	err := stmt.Parse(p)
-	if err != nil {
-		return nil, err
-	}
-
-	return stmt, nil
-}
-
-func (w *WorkspaceStatement) Parse(p *Parser) error {
-
-	_, err := p.Expect(WORKSPACE)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.Expect(OPEN_BRACE)
-	if err != nil {
-		return err
-	}
-
-	closed := false
-
-	for !closed {
-		tok, lit := p.ScanIgnoreWhitespace()
-		switch tok {
-		case MODEL:
-			p.UnScan()
-			w.Model = NewModelStatement()
-			err = nextParse(w.Model, p)
-
-		case VIEWS:
-			p.UnScan()
-			w.Views = NewViewsStatement()
-			err = nextParse(w.Views, p)
-
-		case CLOSING_BRACE:
-			closed = true
-
-		default:
-			return FmtErrorf(p, "unexpected token %s, expecting either model or views stanza or '}'", lit)
-		}
-
-		if err != nil {
-			return err
-		}
-
-	}
-
-	_, err = p.Expect(EOF)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func nextParse(stmnt Statement, p *Parser) error {
-	return stmnt.Parse(p)
-}
-
 type ModelStatement struct {
 	// do not use a map, as the name of an object may change, and would not be updated here.
 	Elements   []Element
@@ -137,11 +63,14 @@ func (m *ModelStatement) Parse(p *Parser) error {
 			m.AddElement(s)
 			err = nextParse(s, p)
 
-		case CONTAINER:
+		case DEPLOYMENT_ENV:
 			p.UnScan()
-			c := NewContainerStatement()
-			m.AddElement(c)
-			err = nextParse(c, p)
+			de := NewDeploymentEnvironmentStatement()
+			m.AddElement(de)
+			err = nextParse(de, p)
+
+		case CONTAINER, COMPONENT, DEPLOYMENT_GROUP, DEPLOYMENT_NODE:
+			err = FmtErrorf(p, "found %s, not a valid child for model", tok.String())
 
 		case CLOSING_BRACE:
 			closed = true
@@ -165,10 +94,5 @@ func (m *ModelStatement) AddElement(e Element) {
 }
 
 func (m *ModelStatement) GetElementByName(name string) Element {
-	for _, e := range m.Elements {
-		if e.GetName() == name {
-			return e
-		}
-	}
-	return nil
+	return GetElementByName(name, m.Elements)
 }

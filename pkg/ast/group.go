@@ -56,6 +56,16 @@ func (g *GroupStatement) Parse(p *Parser) error {
 		tok, lit := p.ScanIgnoreWhitespace()
 		switch tok {
 
+		case COMPONENT:
+			if g.Parent == Container {
+				p.UnScan()
+				c := NewComponentStatement()
+				g.AddElement(c)
+				err = nextParse(c, p)
+			} else {
+				err = FmtErrorf(p, "component is onyl allowed in group as child of container")
+			}
+
 		case CLOSING_BRACE:
 			closed = true
 			continue
@@ -74,4 +84,12 @@ func (g *GroupStatement) Parse(p *Parser) error {
 
 	return nil
 
+}
+
+func (g *GroupStatement) GetElementByName(name string) Element {
+	return GetElementByName(name, g.Elements)
+}
+
+func (g *GroupStatement) AddElement(e Element) {
+	g.Elements = append(g.Elements, e)
 }

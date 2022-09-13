@@ -4,23 +4,25 @@ import (
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
-type PersonStatement struct {
+type ComponentStatement struct {
 	Name        string
 	Description string
+	Technology  string
 	Tags        []string
 	Properties  map[string]string
+	Elements    []Element
 }
 
-func NewPersonStatement() *PersonStatement {
-	ret := &PersonStatement{}
+func NewComponentStatement() *ComponentStatement {
+	ret := &ComponentStatement{}
 
-	ret.AddTags("Element", "Person")
+	ret.AddTags("Element", "Component")
 
 	return ret
 }
 
-func (ps *PersonStatement) Parse(p *Parser) error {
-	lit, err := p.Expect(PERSON)
+func (c *ComponentStatement) Parse(p *Parser) error {
+	lit, err := p.Expect(COMPONENT)
 	if err != nil {
 		return err
 	}
@@ -29,10 +31,18 @@ func (ps *PersonStatement) Parse(p *Parser) error {
 	if err != nil {
 		return err
 	}
-	ps.Name = lit
+	c.Name = lit
 
 	err = p.Maybe(IDENTIFIER, func(tok Token, lit string) error {
-		ps.Description = lit
+		c.Description = lit
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	err = p.Maybe(IDENTIFIER, func(tok Token, lit string) error {
+		c.Technology = lit
 		return nil
 	})
 	if err != nil {
@@ -40,7 +50,7 @@ func (ps *PersonStatement) Parse(p *Parser) error {
 	}
 
 	pTags, err := p.ParseTags()
-	ps.AddTags(pTags...)
+	c.AddTags(pTags...)
 
 	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
@@ -69,15 +79,15 @@ func (ps *PersonStatement) Parse(p *Parser) error {
 	return nil
 }
 
-func (p *PersonStatement) GetElementType() ElementType {
-	return Person
+func (p *ComponentStatement) GetElementType() ElementType {
+	return Component
 }
 
-func (p *PersonStatement) GetName() string {
+func (p *ComponentStatement) GetName() string {
 	return p.Name
 }
 
-func (p *PersonStatement) AddTags(tags ...string) error {
+func (p *ComponentStatement) AddTags(tags ...string) error {
 	p.Tags = append(p.Tags, tags...)
 	return nil
 }

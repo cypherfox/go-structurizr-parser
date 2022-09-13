@@ -92,10 +92,5 @@ func (s *SoftwareSystemStatement) AddElement(e Element) {
 }
 
 func (s *SoftwareSystemStatement) GetElementByName(name string) Element {
-	for _, e := range s.Elements {
-		if s.GetName() == name {
-			return e
-		}
-	}
-	return nil
+	return GetElementByName(name, s.Elements)
 }

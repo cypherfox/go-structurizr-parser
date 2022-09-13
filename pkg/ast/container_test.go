@@ -13,7 +13,9 @@ func TestContainerParse(t *testing.T) {
 			label: "minimal container example",
 			s: `workspace {
 					model {
-						container "Toolshed" {}
+						softwareSystem "Bench" {
+							container "Toolshed" {}
+						}
 					}
 				}`,
 			stmt_fnc: minimalContainerGen,
@@ -23,10 +25,40 @@ func TestContainerParse(t *testing.T) {
 			label: "container with technology example",
 			s: `workspace {
 					model {
-						container "Toolshed" "a set of commonly used tools" "docker" {}
+						softwareSystem "Bench" {
+							container "Toolshed" "a set of commonly used tools" "docker" {}
+						}
 					}
 				}`,
 			stmt_fnc: containerWithTechnologyGen,
+		},
+
+		{
+			label: "container with group example",
+			s: `workspace {
+					model {
+						softwareSystem "Bench" {
+							container "Toolshed" {
+								group "Grp1" {}
+							}
+						}
+					}
+				}`,
+			stmt_fnc: containerWithGroupGen,
+		},
+
+		{
+			label: "container with component example",
+			s: `workspace {
+					model {
+						softwareSystem "Bench" {
+							container "Toolshed" {
+								component "builder1" {}
+							}
+						}
+					}
+				}`,
+			stmt_fnc: containerWithComponentGen,
 		},
 
 		{
@@ -34,7 +66,9 @@ func TestContainerParse(t *testing.T) {
 			s: `workspace {
 					model {
 						enterprise "Corp" {
-							container "Alpine" {}
+							softwareSystem "Bench" {
+								container "Alpine" {}
+							}
 						}
 					}
 				}`,
@@ -48,24 +82,45 @@ func TestContainerParse(t *testing.T) {
 }
 
 func minimalContainerGen() *ast.WorkspaceStatement {
+	ws := minimalModelGen()
+
+	soft := ast.NewSoftwareSystemStatement()
+	soft.Name = "Bench"
+
 	container := ast.NewContainerStatement()
 	container.Name = "Toolshed"
 
-	model := ast.NewModelStatement()
-	model.AddElement(container)
+	soft.AddElement(container)
+	ws.Model.AddElement(soft)
 
-	ret := ast.NewWorkspaceStatement()
-	ret.Model = model
-
-	return ret
+	return ws
 }
 
 func containerWithTechnologyGen() *ast.WorkspaceStatement {
 	ret := minimalContainerGen()
 
-	container := ret.Model.GetElementByName("Toolshed")
+	container, err := ast.WalkPath(ret, "Bench", "Toolshed")
+	if err != nil {
+		return nil
+	}
 	container.(*ast.ContainerStatement).Description = "a set of commonly used tools"
 	container.(*ast.ContainerStatement).Technology = "docker"
+
+	return ret
+}
+
+func containerWithGroupGen() *ast.WorkspaceStatement {
+	ret := minimalContainerGen()
+
+	container, err := ast.WalkPath(ret, "Bench", "Toolshed")
+	if err != nil {
+		return nil
+	}
+
+	group := ast.NewGroupStatement(ast.Container)
+	group.Name = "Grp1"
+
+	container.(*ast.ContainerStatement).AddElement(group)
 
 	return ret
 }

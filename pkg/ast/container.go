@@ -69,6 +69,12 @@ func (c *ContainerStatement) Parse(p *Parser) error {
 			c.AddElement(g)
 			err = nextParse(g, p)
 
+		case COMPONENT:
+			p.UnScan()
+			comp := NewComponentStatement()
+			c.AddElement(comp)
+			err = nextParse(comp, p)
+
 		case CLOSING_BRACE:
 			closed = true
 
@@ -103,10 +109,5 @@ func (c *ContainerStatement) AddElement(e Element) {
 }
 
 func (c *ContainerStatement) GetElementByName(name string) Element {
-	for _, e := range c.Elements {
-		if c.GetName() == name {
-			return e
-		}
-	}
-	return nil
+	return GetElementByName(name, c.Elements)
 }

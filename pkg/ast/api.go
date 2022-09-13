@@ -7,12 +7,14 @@ import (
 type ElementType Token
 
 const (
-	Model          ElementType = ElementType(MODEL)
-	SoftwareSystem ElementType = ElementType(SOFTWARE_SYSTEM)
-	Enterprise     ElementType = ElementType(ENTERPRISE)
-	Group          ElementType = ElementType(GROUP)
-	Person         ElementType = ElementType(PERSON)
-	Container      ElementType = ElementType(CONTAINER)
+	Model                 ElementType = ElementType(MODEL)
+	SoftwareSystem        ElementType = ElementType(SOFTWARE_SYSTEM)
+	Enterprise            ElementType = ElementType(ENTERPRISE)
+	Group                 ElementType = ElementType(GROUP)
+	Person                ElementType = ElementType(PERSON)
+	Container             ElementType = ElementType(CONTAINER)
+	Component             ElementType = ElementType(COMPONENT)
+	DeploymentEnvironment ElementType = ElementType(DEPLOYMENT_ENV)
 )
 
 func (e ElementType) String() string {

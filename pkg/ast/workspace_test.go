@@ -37,9 +37,7 @@ func TestWorkspaceParse(t *testing.T) {
 				model {
 				}
 			}`,
-			stmt: &ast.WorkspaceStatement{
-				Model: ast.NewModelStatement(),
-			},
+			stmt_fnc: minimalModelGen,
 		},
 
 		{
@@ -141,6 +139,12 @@ func errstring(err error) string {
 		return err.Error()
 	}
 	return ""
+}
+
+func minimalModelGen() *ast.WorkspaceStatement {
+	return &ast.WorkspaceStatement{
+		Model: ast.NewModelStatement(),
+	}
 }
 
 func singleSoftwareSystemStmtGen() *ast.WorkspaceStatement {
