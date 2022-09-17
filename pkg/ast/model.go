@@ -42,7 +42,7 @@ func (m *ModelStatement) Parse(p *Parser) error {
 			} else {
 				return FmtErrorf(p, "only one enterprise per model allowed")
 			}
-
+			m.AddElement(e)
 			err = nextParse(e, p)
 
 		case PERSON:
@@ -89,8 +89,9 @@ func (m *ModelStatement) Parse(p *Parser) error {
 	return nil
 }
 
-func (m *ModelStatement) AddElement(e Element) {
+func (m *ModelStatement) AddElement(e Element) error {
 	m.Elements = append(m.Elements, e)
+	return nil
 }
 
 func (m *ModelStatement) GetElementByName(name string) Element {

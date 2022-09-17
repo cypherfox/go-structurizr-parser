@@ -90,6 +90,7 @@ func (g *GroupStatement) GetElementByName(name string) Element {
 	return GetElementByName(name, g.Elements)
 }
 
-func (g *GroupStatement) AddElement(e Element) {
+func (g *GroupStatement) AddElement(e Element) error {
 	g.Elements = append(g.Elements, e)
+	return nil
 }

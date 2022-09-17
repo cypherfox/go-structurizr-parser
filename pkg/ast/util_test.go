@@ -9,7 +9,7 @@ import (
 func TestWalkPath(t *testing.T) {
 	ret := containerWithGroupGen()
 
-	group, err := ast.WalkPath(ret, "Toolshed", "Grp1")
+	group, err := ast.WalkPath(ret, "App", "Toolshed", "Grp1")
 	if err != nil {
 		t.Errorf("failed to walk path: %s", err)
 		return

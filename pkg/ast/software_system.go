@@ -60,11 +60,17 @@ func (s *SoftwareSystemStatement) Parse(p *Parser) error {
 			s.AddElement(g)
 			err = nextParse(g, p)
 
+		case CONTAINER:
+			p.UnScan()
+			c := NewContainerStatement()
+			s.AddElement(c)
+			err = nextParse(c, p)
+
 		case CLOSING_BRACE:
 			closed = true
 
 		default:
-			err = FmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
@@ -87,8 +93,9 @@ func (s *SoftwareSystemStatement) AddTags(tags ...string) error {
 	return nil
 }
 
-func (s *SoftwareSystemStatement) AddElement(e Element) {
+func (s *SoftwareSystemStatement) AddElement(e Element) error {
 	s.Elements = append(s.Elements, e)
+	return nil
 }
 
 func (s *SoftwareSystemStatement) GetElementByName(name string) Element {

@@ -13,8 +13,10 @@ func TestComponentParse(t *testing.T) {
 			label: "container with component example",
 			s: `workspace {
 					model {
-						container "Toolshed" {
-							component "builder1" {}
+						softwareSystem "App" {
+							container "Toolshed" {
+								component "builder1" {}
+							}
 						}
 					}
 				}`,
@@ -25,9 +27,11 @@ func TestComponentParse(t *testing.T) {
 			label: "container with two component example",
 			s: `workspace {
 					model {
-						container "Toolshed" {
-							component "builder1" {}
-							component "builder2" {}
+						softwareSystem "App" {
+							container "Toolshed" {
+								component "builder1" {}
+								component "builder2" {}
+							}
 						}
 					}
 				}`,
@@ -38,9 +42,11 @@ func TestComponentParse(t *testing.T) {
 			label: "component in group example",
 			s: `workspace {
 					model {
-						container "Toolshed" {
-							group "Grp1" {
-								component "builder1" {}
+						softwareSystem "App" {
+							container "Toolshed" {
+								group "Grp1" {
+									component "builder1" {}
+								}
 							}
 						}
 					}
@@ -52,27 +58,18 @@ func TestComponentParse(t *testing.T) {
 			label: "container with component example",
 			s: `workspace {
 					model {
-						container "Toolshed" {
-							component "builder1" {}
+						softwareSystem "App" {
+							container "Toolshed" {
+								component "builder1" {}
+							}
 						}
 					}
 				}`,
 			stmt_fnc: containerWithComponentGen,
 		},
 
-		{
-			label: "container in enterprise",
-			s: `workspace {
-					model {
-						enterprise "Corp" {
-							container "Alpine" {}
-						}
-					}
-				}`,
-			stmt_fnc: enterpriseWithContainerGen,
-		},
-
 		// ERRORS
+		// (none at the moment)
 	}
 
 	runTests(t, tests)
@@ -81,7 +78,7 @@ func TestComponentParse(t *testing.T) {
 func containerWithComponentGen() *ast.WorkspaceStatement {
 	ret := minimalContainerGen()
 
-	container := ret.Model.GetElementByName("Toolshed")
+	container, _ := ast.WalkPath(ret, "App", "Toolshed")
 
 	component := ast.NewComponentStatement()
 	component.Name = "builder1"
@@ -94,7 +91,7 @@ func containerWithComponentGen() *ast.WorkspaceStatement {
 func containerWithTwoComponentGen() *ast.WorkspaceStatement {
 	ret := containerWithComponentGen()
 
-	container := ret.Model.GetElementByName("Toolshed")
+	container, _ := ast.WalkPath(ret, "App", "Toolshed")
 
 	component := ast.NewComponentStatement()
 	component.Name = "builder2"
@@ -107,7 +104,7 @@ func containerWithTwoComponentGen() *ast.WorkspaceStatement {
 func componentInGroupGen() *ast.WorkspaceStatement {
 	ret := containerWithGroupGen()
 
-	group, err := ast.WalkPath(ret, "Toolshed", "Grp1")
+	group, err := ast.WalkPath(ret, "App", "Toolshed", "Grp1")
 	if err != nil {
 		return nil
 	}

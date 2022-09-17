@@ -95,16 +95,12 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 }
 
 func (es *EnterpriseStatement) AddElement(e Element) error {
-	etype := e.GetElementType()
-	switch etype {
-	case Group:
-		break
-	case Person:
-		break
-	case SoftwareSystem:
+	eType := e.GetElementType()
+	switch eType {
+	case Group, Person, SoftwareSystem:
 		break
 	default:
-		return fmt.Errorf("element type %s not allowed in enterprise statement", etype.String())
+		return fmt.Errorf("element type %s not allowed in enterprise statement", eType.String())
 	}
 
 	es.Elements = append(es.Elements, e)

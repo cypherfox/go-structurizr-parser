@@ -104,8 +104,9 @@ func (c *ContainerStatement) AddTags(tags ...string) error {
 	return nil
 }
 
-func (c *ContainerStatement) AddElement(e Element) {
+func (c *ContainerStatement) AddElement(e Element) error {
 	c.Elements = append(c.Elements, e)
+	return nil
 }
 
 func (c *ContainerStatement) GetElementByName(name string) Element {

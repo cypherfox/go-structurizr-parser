@@ -24,7 +24,7 @@ func (e ElementType) String() string {
 
 type ElementContainer interface {
 	GetElementByName(name string) Element
-	AddElement(Element)
+	AddElement(Element) error
 }
 
 type Element interface {

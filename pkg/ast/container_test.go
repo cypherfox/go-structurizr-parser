@@ -13,7 +13,7 @@ func TestContainerParse(t *testing.T) {
 			label: "minimal container example",
 			s: `workspace {
 					model {
-						softwareSystem "Bench" {
+						softwareSystem "App" {
 							container "Toolshed" {}
 						}
 					}
@@ -25,7 +25,7 @@ func TestContainerParse(t *testing.T) {
 			label: "container with technology example",
 			s: `workspace {
 					model {
-						softwareSystem "Bench" {
+						softwareSystem "App" {
 							container "Toolshed" "a set of commonly used tools" "docker" {}
 						}
 					}
@@ -37,7 +37,7 @@ func TestContainerParse(t *testing.T) {
 			label: "container with group example",
 			s: `workspace {
 					model {
-						softwareSystem "Bench" {
+						softwareSystem "App" {
 							container "Toolshed" {
 								group "Grp1" {}
 							}
@@ -51,7 +51,7 @@ func TestContainerParse(t *testing.T) {
 			label: "container with component example",
 			s: `workspace {
 					model {
-						softwareSystem "Bench" {
+						softwareSystem "App" {
 							container "Toolshed" {
 								component "builder1" {}
 							}
@@ -66,7 +66,7 @@ func TestContainerParse(t *testing.T) {
 			s: `workspace {
 					model {
 						enterprise "Corp" {
-							softwareSystem "Bench" {
+							softwareSystem "App" {
 								container "Alpine" {}
 							}
 						}
@@ -85,7 +85,7 @@ func minimalContainerGen() *ast.WorkspaceStatement {
 	ws := minimalModelGen()
 
 	soft := ast.NewSoftwareSystemStatement()
-	soft.Name = "Bench"
+	soft.Name = "App"
 
 	container := ast.NewContainerStatement()
 	container.Name = "Toolshed"
@@ -99,7 +99,7 @@ func minimalContainerGen() *ast.WorkspaceStatement {
 func containerWithTechnologyGen() *ast.WorkspaceStatement {
 	ret := minimalContainerGen()
 
-	container, err := ast.WalkPath(ret, "Bench", "Toolshed")
+	container, err := ast.WalkPath(ret, "App", "Toolshed")
 	if err != nil {
 		return nil
 	}
@@ -112,7 +112,7 @@ func containerWithTechnologyGen() *ast.WorkspaceStatement {
 func containerWithGroupGen() *ast.WorkspaceStatement {
 	ret := minimalContainerGen()
 
-	container, err := ast.WalkPath(ret, "Bench", "Toolshed")
+	container, err := ast.WalkPath(ret, "App", "Toolshed")
 	if err != nil {
 		return nil
 	}
@@ -126,12 +126,13 @@ func containerWithGroupGen() *ast.WorkspaceStatement {
 }
 
 func enterpriseWithContainerGen() *ast.WorkspaceStatement {
-	ret := minimalEnterpriseGen()
+	ret := enterpriseWithSoftwareSystemGen()
 
+	sSys, _ := ast.WalkPath(ret, "Corp", "App")
 	container := ast.NewContainerStatement()
-	container.Name = "Toolshed"
+	container.Name = "Alpine"
 
-	ret.Model.Enterprise.AddElement(container)
+	sSys.(*ast.SoftwareSystemStatement).AddElement(container)
 
 	return ret
 }

@@ -52,6 +52,7 @@ func minimalEnterpriseGen() *ast.WorkspaceStatement {
 
 	model := ast.NewModelStatement()
 	model.Enterprise = enterprise
+	model.AddElement(enterprise)
 
 	ret := ast.NewWorkspaceStatement()
 	ret.Model = model
