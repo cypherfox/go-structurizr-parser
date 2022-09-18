@@ -5,11 +5,13 @@ import (
 )
 
 type SoftwareSystemStatement struct {
+	BaseStatement
+	BaseElementContainer
 	Name        string
 	Description string
 	Tags        []string
 	Properties  map[string]string
-	Elements    []Element
+	Elements    []ElementI
 }
 
 func NewSoftwareSystemStatement() *SoftwareSystemStatement {
@@ -91,13 +93,4 @@ func (s *SoftwareSystemStatement) GetName() string { return s.Name }
 func (s *SoftwareSystemStatement) AddTags(tags ...string) error {
 	s.Tags = append(s.Tags, tags...)
 	return nil
-}
-
-func (s *SoftwareSystemStatement) AddElement(e Element) error {
-	s.Elements = append(s.Elements, e)
-	return nil
-}
-
-func (s *SoftwareSystemStatement) GetElementByName(name string) Element {
-	return GetElementByName(name, s.Elements)
 }

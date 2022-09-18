@@ -5,6 +5,7 @@ import (
 )
 
 type WorkspaceStatement struct {
+	BaseStatement
 	Model *ModelStatement
 	Views *ViewsStatement
 }

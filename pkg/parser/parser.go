@@ -47,11 +47,11 @@ func (p *Parser) ScanIgnoreWhitespace() (tok Token, lit string) {
 	if tok == WS {
 		tok, lit = p.scan()
 	}
-	fmt.Printf("tok: %s lit: >%s<\n", tok.String(), lit)
+	//	fmt.Printf("tok: %s lit: >%s<\n", tok.String(), lit)
 	return
 }
 
-// Expect expects a certain token and fail with usefull error message if it is
+// Expect expects a certain token and fail with useful error message if it is
 // not found. It will return the literal if successful
 func (p *Parser) Expect(expected Token) (string, error) {
 	lit := ""
@@ -62,7 +62,7 @@ func (p *Parser) Expect(expected Token) (string, error) {
 	return lit, nil
 }
 
-// Expect expects a certain identifier fail with usefull error message if it is
+// Expect expects a certain identifier fail with useful error message if it is
 // not found. It will return the literal if successful
 func (p *Parser) ExpectIdentifier(expected string) error {
 	lit, err := p.Expect(IDENTIFIER)

@@ -6,7 +6,7 @@ import (
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
-func GetElementByName(name string, elements []Element) Element {
+func GetElementByName(name string, elements []ElementI) ElementI {
 	for _, e := range elements {
 		if e.GetName() == name {
 			return e
@@ -21,8 +21,8 @@ func nextParse(stmnt Statement, p *Parser) error {
 }
 
 // WalkPath will return an element identified by a list of names.
-func WalkPath(ws *WorkspaceStatement, path ...string) (Element, error) {
-	var elem Element
+func WalkPath(ws *WorkspaceStatement, path ...string) (ElementI, error) {
+	var elem ElementI
 
 	elem = ws.Model.GetElementByName(path[0])
 	if elem == nil {
@@ -42,4 +42,17 @@ func WalkPath(ws *WorkspaceStatement, path ...string) (Element, error) {
 
 	}
 	return elem, nil
+}
+
+func addAllowedElement(elements []ElementI, parentType ElementType, elem ElementI, allowed ...ElementType) ([]ElementI, error) {
+	eType := elem.GetElementType()
+
+	for _, t := range allowed {
+		if t == eType {
+			elements = append(elements, elem)
+			return elements, nil
+		}
+	}
+
+	return elements, fmt.Errorf("element type %s not allowed in %s statement", eType.String(), parentType.String())
 }

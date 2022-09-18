@@ -7,9 +7,10 @@ import (
 )
 
 type GroupStatement struct {
-	Parent   ElementType
-	Name     string
-	Elements []Element
+	BaseStatement
+	BaseElementContainer
+	Parent ElementType
+	Name   string
 }
 
 func NewGroupStatement(parent ElementType) *GroupStatement {
@@ -84,13 +85,4 @@ func (g *GroupStatement) Parse(p *Parser) error {
 
 	return nil
 
-}
-
-func (g *GroupStatement) GetElementByName(name string) Element {
-	return GetElementByName(name, g.Elements)
-}
-
-func (g *GroupStatement) AddElement(e Element) error {
-	g.Elements = append(g.Elements, e)
-	return nil
 }

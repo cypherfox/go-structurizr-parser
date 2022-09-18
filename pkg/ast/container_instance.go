@@ -4,26 +4,24 @@ import (
 	. "github.com/cypherfox/go-structurizr-parser/pkg/parser"
 )
 
-type ComponentStatement struct {
+type ContainerInstanceStatement struct {
 	BaseStatement
 	Name        string
 	Description string
-	Technology  string
 	Tags        []string
 	Properties  map[string]string
-	Elements    []ElementI
 }
 
-func NewComponentStatement() *ComponentStatement {
-	ret := &ComponentStatement{}
+func NewContainerInstanceStatement() *ContainerInstanceStatement {
+	ret := &ContainerInstanceStatement{}
 
-	ret.AddTags("Element", "Component")
+	ret.AddTags("Element", "ContainerInstance")
 
 	return ret
 }
 
-func (c *ComponentStatement) Parse(p *Parser) error {
-	lit, err := p.Expect(COMPONENT)
+func (ps *ContainerInstanceStatement) Parse(p *Parser) error {
+	lit, err := p.Expect(CONTAINER_INSTANCE)
 	if err != nil {
 		return err
 	}
@@ -32,18 +30,10 @@ func (c *ComponentStatement) Parse(p *Parser) error {
 	if err != nil {
 		return err
 	}
-	c.Name = lit
+	ps.Name = lit
 
 	err = p.Maybe(IDENTIFIER, func(tok Token, lit string) error {
-		c.Description = lit
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	err = p.Maybe(IDENTIFIER, func(tok Token, lit string) error {
-		c.Technology = lit
+		ps.Description = lit
 		return nil
 	})
 	if err != nil {
@@ -51,7 +41,7 @@ func (c *ComponentStatement) Parse(p *Parser) error {
 	}
 
 	pTags, err := p.ParseTags()
-	c.AddTags(pTags...)
+	ps.AddTags(pTags...)
 
 	_, err = p.Expect(OPEN_BRACE)
 	if err != nil {
@@ -68,7 +58,7 @@ func (c *ComponentStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			err = FmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
@@ -80,15 +70,15 @@ func (c *ComponentStatement) Parse(p *Parser) error {
 	return nil
 }
 
-func (p *ComponentStatement) GetElementType() ElementType {
-	return Component
+func (p *ContainerInstanceStatement) GetElementType() ElementType {
+	return ContainerInstance
 }
 
-func (p *ComponentStatement) GetName() string {
+func (p *ContainerInstanceStatement) GetName() string {
 	return p.Name
 }
 
-func (p *ComponentStatement) AddTags(tags ...string) error {
+func (p *ContainerInstanceStatement) AddTags(tags ...string) error {
 	p.Tags = append(p.Tags, tags...)
 	return nil
 }

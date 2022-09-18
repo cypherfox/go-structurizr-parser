@@ -7,6 +7,7 @@ import (
 )
 
 type ViewsStatement struct {
+	BaseStatement
 	name string
 }
 

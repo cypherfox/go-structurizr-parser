@@ -103,7 +103,8 @@ func TestWorkspaceParse(t *testing.T) {
 						softwaresystem foo {
 						}
 				`,
-			err: `<string input>:8: found <end of file> (''), expected '}'`},
+			err: `<string input>:8: unexpected end of file in definition of model`,
+		},
 	}
 
 	runTests(t, tests)

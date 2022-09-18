@@ -7,6 +7,7 @@ import (
 )
 
 type DeploymentEnvironmentStatement struct {
+	BaseStatement
 	Name string
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type EnterpriseStatement struct {
-	Name     string
-	Elements []Element
+	BaseStatement
+	BaseElementContainer
+	Name string
 }
 
 func NewEnterpriseStatement() *EnterpriseStatement {
@@ -94,7 +95,7 @@ func (e *EnterpriseStatement) Parse(p *Parser) error {
 
 }
 
-func (es *EnterpriseStatement) AddElement(e Element) error {
+func (es *EnterpriseStatement) AddElement(e ElementI) error {
 	eType := e.GetElementType()
 	switch eType {
 	case Group, Person, SoftwareSystem:
@@ -105,8 +106,4 @@ func (es *EnterpriseStatement) AddElement(e Element) error {
 
 	es.Elements = append(es.Elements, e)
 	return nil
-}
-
-func (es *EnterpriseStatement) GetElementByName(name string) Element {
-	return GetElementByName(name, es.Elements)
 }

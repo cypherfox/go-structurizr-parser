@@ -5,12 +5,13 @@ import (
 )
 
 type ContainerStatement struct {
+	BaseStatement
+	BaseElementContainer
 	Name        string
 	Description string
 	Technology  string
 	Tags        []string
 	Properties  map[string]string
-	Elements    []Element
 }
 
 func NewContainerStatement() *ContainerStatement {
@@ -102,13 +103,4 @@ func (c *ContainerStatement) GetName() string {
 func (c *ContainerStatement) AddTags(tags ...string) error {
 	c.Tags = append(c.Tags, tags...)
 	return nil
-}
-
-func (c *ContainerStatement) AddElement(e Element) error {
-	c.Elements = append(c.Elements, e)
-	return nil
-}
-
-func (c *ContainerStatement) GetElementByName(name string) Element {
-	return GetElementByName(name, c.Elements)
 }

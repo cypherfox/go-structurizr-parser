@@ -5,6 +5,7 @@ import (
 )
 
 type PersonStatement struct {
+	BaseStatement
 	Name        string
 	Description string
 	Tags        []string
@@ -57,7 +58,7 @@ func (ps *PersonStatement) Parse(p *Parser) error {
 			closed = true
 
 		default:
-			err = FmtErrorf(p, "unexected token %s, expecting '}'", lit)
+			err = FmtErrorf(p, "unexpected token %s, expecting '}'", lit)
 		}
 
 		if err != nil {
